@@ -83,7 +83,7 @@ An Entity-Relationship Diagram (ERD) provides a visual representation of the dat
 
 > **Figure:** ERD depicting the relationship between User and Event tables.
 >
-> ![Entity-Relationship Diagram](docs/erd.png)
+> ![Entity-Relationship Diagram](database_erd.png)
 >
 > **Note:** You can generate an ERD using tools like dbdiagram.io, Lucidchart, or DrawSQL. After creating the diagram, save it as `erd.png` and place it in the `docs/` directory.
 
