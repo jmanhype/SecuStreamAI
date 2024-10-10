@@ -1,0 +1,32 @@
+# DSPy Configuration
+
+# Language Model Settings
+language_model:
+  name: 'gpt-3.5-turbo'  # Specify the desired model
+  api_key: ${OPENAI_API_KEY}  # Use environment variable for security
+
+# Caching Settings
+caching:
+  enabled: true
+  expiration: 3600  # Cache expiration time in seconds (1 hour)
+
+# Logging Configuration
+logging:
+  level: 'INFO'
+
+# Retry Strategy
+retry:
+  max_attempts: 3
+  backoff_factor: 2  # Exponential backoff factor
+
+# Rate Limiting
+rate_limit:
+  requests_per_minute: 60  # Adjust based on your requirements
+
+# Prompt Templates
+prompt_templates:
+  security_event_analysis: |
+    Analyze the following security event:
+    Context: {context}
+    Event Description: {event_description}
+    Provide a risk level, recommended action, and brief analysis.

@@ -1,0 +1,1 @@
+0 1 * * * python /app/src/scripts/nightly_finetune.py >> /var/log/cron.log 2>&1

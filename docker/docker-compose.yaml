@@ -1,0 +1,156 @@
+# docker/docker-compose.yaml
+
+version: '3.8'
+services:
+  zookeeper:
+    image: confluentinc/cp-zookeeper:latest
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - 22181:2181
+
+  kafka:
+    image: confluentinc/cp-kafka:latest
+    depends_on:
+      - zookeeper
+    ports:
+      - 29092:29092
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,PLAINTEXT_HOST://0.0.0.0:29092
+
+  redis:
+    image: redis:latest
+    ports:
+      - 6379:6379
+    command: redis-server
+    volumes:
+      - redis-data:/data
+
+  postgres:
+    image: postgres:13
+    environment:
+      POSTGRES_DB: "${POSTGRES_DB}"
+      POSTGRES_USER: "${POSTGRES_USER}"
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+  prometheus:
+    image: prom/prometheus:latest
+    volumes:
+      - ./src/config/prometheus_config.yaml:/etc/prometheus/prometheus.yml  # Mount local Prometheus config
+      - prometheus-data:/prometheus  # Persist Prometheus data
+    ports:
+      - 9090:9090
+
+  kafka_exporter:
+    image: danielqsj/kafka-exporter:latest
+    environment:
+      KAFKA_SERVER: "kafka:9092"
+    ports:
+      - 9308:9308
+    depends_on:
+      - kafka
+
+  redis_exporter:
+    image: oliver006/redis_exporter:latest
+    ports:
+      - 9121:9121
+    command:
+      - "--redis.addr=redis:6379"
+    depends_on:
+      - redis
+
+  app:
+    build: ../  # Adjust based on your Dockerfile location
+    depends_on:
+      - kafka
+      - redis
+      - prometheus
+      - kafka_exporter
+      - redis_exporter
+      - postgres
+    ports:
+      - 8080:8080
+    environment:
+      PROJECT_NAME: "${PROJECT_NAME}"
+      PROJECT_VERSION: "${PROJECT_VERSION}"
+      API_V1_STR: "${API_V1_STR}"
+      KAFKA_SERVER: "${KAFKA_SERVER}"
+      KAFKA_TOPIC: "${KAFKA_TOPIC}"
+      REDIS_HOST: "${REDIS_HOST}"
+      REDIS_PORT: "${REDIS_PORT}"
+      PROMETHEUS_PORT: "${PROMETHEUS_PORT}"
+      OPENAI_API_KEY: "${OPENAI_API_KEY}"
+      POSTGRES_DB: "${POSTGRES_DB}"
+      POSTGRES_USER: "${POSTGRES_USER}"
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
+      POSTGRES_HOST: "postgres"
+      POSTGRES_PORT: "5432"
+    volumes:
+      - ../:/app  # Mount your application code
+    command: ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8080", "--reload"]
+
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3000:3000"  # Grafana web interface
+    volumes:
+      - ./docker/grafana:/var/lib/grafana  # Persist Grafana data
+      - ./docker/grafana/provisioning:/etc/grafana/provisioning  # Provisioning configuration
+      - ./docker/grafana/dashboards:/etc/grafana/provisioning/dashboards  # Grafana dashboards
+    depends_on:
+      - prometheus  # Ensure Prometheus starts before Grafana
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin  # Set Grafana admin password (change as needed)
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"  # React development server port
+    environment:
+      - CHOKIDAR_USEPOLLING=true  # Optional: For file watching in some environments
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    depends_on:
+      - app  # Ensure the backend is up before the frontend
+
+  celery_worker:
+    build: .
+    command: celery -A src.celery_app worker --loglevel=info
+    volumes:
+      - ./src:/app/src
+    depends_on:
+      - redis
+      - app
+
+  celery_beat:
+    build: .
+    command: celery -A src.celery_app beat --loglevel=info
+    volumes:
+      - ./src:/app/src
+    depends_on:
+      - redis
+      - app
+
+volumes:
+  redis-data:
+    driver: local
+  prometheus-data:
+    driver: local
+  grafana-data:
+    driver: local  # Add this volume for Grafana persistence
+  postgres-data:
+    driver: local

@@ -1,0 +1,16 @@
+bootstrap_servers:
+  - localhost:29092
+
+topic: security-events
+
+consumer:
+  group_id: security_events_consumer
+  auto_offset_reset: earliest
+  enable_auto_commit: true
+
+producer:
+  acks: all
+  retries: 3
+  batch_size: 16384
+  linger_ms: 1
+  buffer_memory: 33554432

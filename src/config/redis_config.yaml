@@ -1,0 +1,16 @@
+host: localhost
+port: 6379
+db: 0
+max_connections: 10
+socket_timeout: 5
+socket_connect_timeout: 5
+retry_on_timeout: true
+health_check_interval: 30
+
+# Caching settings
+cache_expiration: 3600  # 1 hour in seconds
+
+# Rate limiting settings
+rate_limit:
+  window: 60  # Time window in seconds
+  max_requests: 100  # Maximum number of requests per window

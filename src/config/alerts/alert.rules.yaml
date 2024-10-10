@@ -1,0 +1,11 @@
+groups:
+  - name: secustreamai_alerts
+    rules:
+      - alert: HighErrorRate
+        expr: job:request_errors:rate5m > 0.05
+        for: 10m
+        labels:
+          severity: "critical"
+        annotations:
+          summary: "High error rate detected for {{ $labels.job }}"
+          description: "The error rate for job '{{ $labels.job }}' has exceeded 5% over the last 10 minutes."

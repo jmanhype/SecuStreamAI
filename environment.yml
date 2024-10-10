@@ -1,0 +1,22 @@
+name: secustreamai
+channels:
+  - defaults
+  - conda-forge
+dependencies:
+  - python=3.9
+  - pip
+  - pip:
+    - fastapi
+    - uvicorn
+    - kafka-python
+    - redis
+    - dspy-ai
+    - torch
+    - transformers
+    - pydantic
+    - sqlalchemy
+    - alembic
+    - prometheus-client
+    - celery
+    - pyyaml
+    - python-dotenv
