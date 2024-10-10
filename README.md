@@ -60,48 +60,65 @@ cd SecuStreamAI
 
 ### Environment Configuration
 
-SecuStreamAI uses environment variables for configuration. Create a `.env` file in the root directory:
+SecuStreamAI uses environment variables for configuration. Follow these steps to set up your environment:
 
-```bash
-cp .env.example .env
-```
+1. Copy the example environment file:
 
-Edit the `.env` file to set your environment variables:
+   ```bash
+   cp .env.example .env
+   ```
 
-```env
-# Project Settings
-PROJECT_NAME="SecuStreamAI"
-PROJECT_VERSION="1.0.0"
-API_V1_STR="/api/v1"
+2. Edit the `.env` file and set your environment variables:
 
-# Kafka Configuration
-KAFKA_SERVER="kafka:29092"
-KAFKA_TOPIC="security-events"
+   ```env
+   # JWT Configuration
+   SECRET_KEY=your_secret_key_here
+   ALGORITHM=HS256
+   ACCESS_TOKEN_EXPIRE_MINUTES=15
 
-# Redis Configuration
-REDIS_HOST="redis"
-REDIS_PORT=6379
+   # Project Settings
+   PROJECT_NAME=SecuStreamAI
+   PROJECT_VERSION=1.0.0
+   API_V1_STR=/api/v1
 
-# Prometheus Configuration
-PROMETHEUS_PORT=8000
+   # Kafka Configuration
+   KAFKA_SERVER=kafka:29092
+   KAFKA_TOPIC=security-events
 
-# OpenAI Configuration
-OPENAI_API_KEY="your_openai_api_key"
+   # Redis Configuration
+   REDIS_HOST=redis
+   REDIS_PORT=6379
 
-# Security Configuration
-SECRET_KEY="your_secret_key"
-ALGORITHM="HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES=30
+   # Prometheus Configuration
+   PROMETHEUS_PORT=8000
 
-# PostgreSQL Configuration
-POSTGRES_HOST="postgres"
-POSTGRES_PORT="5432"
-POSTGRES_DB="secustreamai"
-POSTGRES_USER="secustreamai_user"
-POSTGRES_PASSWORD="your_secure_password"
-```
+   # OpenAI Configuration
+   OPENAI_API_KEY=your_openai_api_key_here
 
-**Note:** Replace placeholders like `your_openai_api_key`, `your_secret_key`, and `your_secure_password` with your actual credentials.
+   # PostgreSQL Configuration
+   POSTGRES_HOST=postgres
+   POSTGRES_PORT=5432
+   POSTGRES_DB=secustreamai
+   POSTGRES_USER=secustreamai_user
+   POSTGRES_PASSWORD=your_secure_password_here
+   ```
+
+   Replace the placeholder values (e.g., `your_secret_key_here`, `your_openai_api_key_here`, `your_secure_password_here`) with your actual credentials and desired settings.
+
+3. Ensure that `.env` is added to your `.gitignore` file to prevent accidentally committing sensitive information:
+
+   ```bash
+   echo ".env" >> .gitignore
+   ```
+
+4. If you previously committed a `.env` file, remove it from Git tracking:
+
+   ```bash
+   git rm --cached .env
+   git commit -m "Remove .env from Git tracking"
+   ```
+
+Remember to never commit your actual `.env` file to the repository. The `.env.example` file serves as a template for other developers to understand what environment variables are needed for the project.
 
 ## Conda Environment Setup
 
