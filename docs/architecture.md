@@ -10,7 +10,7 @@ SecuStreamAI is a comprehensive security event processing system designed to gen
 >
 > ![Architecture Diagram](docs/architecture_diagram.png)
 >
-> **Note:** You can create the architecture diagram using tools like [dbdiagram.io](https://dbdiagram.io/), [Lucidchart](https://www.lucidchart.com/), or [DrawSQL](https://drawsql.app/). Save the diagram as `architecture_diagram.png` and place it in the `docs/` directory.
+
 
 ## Components
 
