@@ -391,3 +391,33 @@ For any questions or feedback, please contact [your.email@example.com](mailto:yo
 - [Alembic](https://alembic.sqlalchemy.org/)
 - [SQLAlchemy](https://www.sqlalchemy.org/)
 - [Confluent Kafka](https://www.confluent.io/)
+
+## Roadmap
+
+### Short-term Goals
+
+- **Enhance Event Analysis**: Improve the accuracy and speed of event analysis using advanced machine learning techniques.
+- **Integrate with SIEM Systems**: Seamlessly integrate SecuStreamAI with popular SIEM systems for comprehensive security monitoring.
+- **Improve User Interface**: Enhance the user interface for easier navigation and more intuitive event analysis.
+
+### Mid-term Goals
+
+- **Develop Advanced Threat Detection**: Implement advanced threat detection capabilities using AI and machine learning.
+- **Integrate with Cloud Security Platforms**: Integrate SecuStreamAI with leading cloud security platforms for comprehensive security monitoring.
+- **Enhance Scalability**: Improve the scalability of SecuStreamAI to handle large volumes of security events.
+
+### Long-term Goals
+
+- **Develop a Predictive Analytics Engine**: Develop a predictive analytics engine to forecast potential security threats.
+- **Integrate with IoT Devices**: Integrate SecuStreamAI with IoT devices for real-time security monitoring.
+- **Develop a Security Orchestration Platform**: Develop a security orchestration platform to automate security incident response.
+
+## Stopping the Application
+
+To stop all running services, execute:
+
+```bash
+docker-compose down
+```
+
+This command stops and removes all containers defined in the `docker/docker-compose.yaml` file.
