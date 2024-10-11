@@ -1,3 +1,5 @@
 src/.env
 src/.env
 docker/.env
+.env
+.env.example
