@@ -1,13 +1,9 @@
 # src/main.py
-
 import sys
-import subprocess
+import os
 
-# Ensure we're running in the correct Conda environment
-if not sys.prefix.endswith('secustreamai'):
-    print("Activating secustreamai Conda environment...")
-    subprocess.call(['conda', 'run', '-n', 'secustreamai', 'python'] + sys.argv)
-    sys.exit(0)
+# Add the src directory to the Python path
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 import asyncio
 import json
@@ -17,21 +13,20 @@ from dotenv import load_dotenv
 from fastapi import FastAPI, Depends
 import uvicorn
 from kafka import KafkaConsumer
-import redis  # Consider removing if not directly used
 import dspy
 from pipeline.model_inference import perform_inference
 from api.v1.router import api_router
 from core.config import settings
-from services.cache_service import cache_service  # Existing import for caching
-from services.analytics_service import update_risk_counters  # Existing import
+from services.cache_service import cache_service
+from services.analytics_service import update_risk_counters
 from services.prometheus_client import (
     start_metrics_server,
     increment_event_count,
     increment_analysis_errors,
     observe_event_processing_time
 )
-from services.redis_client import redis_client  # New import
-from services.spark_processing import start_spark_processing  # New import
+from services.redis_client import redis_client
+from services.spark_processing import start_spark_processing
 from src.api.dependencies.rate_limiter import rate_limit
 from prometheus_fastapi_instrumentator import Instrumentator
 
@@ -50,14 +45,11 @@ logger = logging.getLogger(__name__)
 # Configure DSPy with OpenAI model
 openai_lm = dspy.OpenAI(
     model='gpt-3.5-turbo',
-    api_key=settings.OPENAI_API_KEY  # Use settings
+    api_key=settings.OPENAI_API_KEY
 )
 dspy.settings.configure(lm=openai_lm)
 
-# Remove direct Redis client initialization if not needed
-# redis_client = redis.Redis(host=settings.REDIS_HOST, port=settings.REDIS_PORT, db=0)
-
-app = FastAPI(title=settings.PROJECT_NAME, version=settings.PROJECT_VERSION)
+app = FastAPI(title=settings.PROJECT_NAME, openapi_url=f"{settings.API_V1_STR}/openapi.json")
 
 # Initialize Prometheus Instrumentation
 instrumentator = Instrumentator()
@@ -71,9 +63,6 @@ app.include_router(
     prefix=settings.API_V1_STR,
     dependencies=[Depends(rate_limit(times=100, seconds=3600))]  # 100 requests per hour per IP
 )
-
-# Define the REQUEST_TIME metric (Consider removing if using PrometheusClient)
-# If kept, move to prometheus_client.py
 
 @dspy.settings.configure(lm=openai_lm)
 def process_event(event):
@@ -96,7 +85,7 @@ def process_event(event):
 
         # Store analysis result in Redis using cache_service
         event_key = f"event:{event['timestamp']}_{event['event_type']}"
-        cache_service.set(event_key, inference_result)  # Updated to use cache_service
+        cache_service.set(event_key, inference_result)
 
         # Update analytics counters
         update_risk_counters(inference_result['risk_level'])

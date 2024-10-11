@@ -5,7 +5,6 @@ from typing import Dict
 from src.services.cache_service import cache_service  # Updated import
 import torch
 from src.ml_models.pytorch_model import SecurityEventModel
-from logging import logger
 from src.utils.cache_service import cache_service
 
 logger = logging.getLogger(__name__)

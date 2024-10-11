@@ -1,7 +1,7 @@
 import pytest
 from sqlalchemy.orm import Session
 from src.db.database import get_db
-from src.db.models import Event
+from src.models.event import Event
 from src.db.crud import create_event, get_event, get_events, update_event, delete_event
 
 @pytest.fixture(scope="module")
